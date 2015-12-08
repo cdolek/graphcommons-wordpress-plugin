@@ -17,13 +17,15 @@ class GraphCommons {
     private $plugin_path;
     private $plugin_url;
     private $api_key;
+    private $api_limit;
     
     function __construct() 
     {   
         // Set up default vars
         $this->plugin_path          = plugin_dir_path( __FILE__ );
         $this->plugin_url           = plugin_dir_url( __FILE__ );
-        $this->api_key              = esc_attr( get_option( 'graphcommons-api_key' ) );
+        $this->api_key              = esc_attr( get_option( 'gc-api_key' ) );
+        $this->api_limit            = 10;
 
         // Set up activation hooks
         register_activation_hook( __FILE__, array(&$this,   'activate') );
@@ -53,9 +55,15 @@ class GraphCommons {
         if( isset($gc_action) && !empty($gc_action) ) {            
 
             switch ($gc_action) {
-                
-                case 'tag':
-                    // $this->grabInstagramPhotos('https://api.instagram.com/v1/tags/'.$gc_keyword.'/media/recent?api_key='.$this->api_key.'&count=100');
+
+                /**
+                *
+                *   API Endpoints
+
+                */                
+
+                case 'nodes_search':
+                    $this->gc_api_nodes_search('https://graphcommons.com/api/v1/nodes/search?query='. $gc_keyword . '&limit=' . $this->api_limit);
                     break;
 
                 /**
@@ -69,7 +77,6 @@ class GraphCommons {
                     var_dump( $gc_action );
                     var_dump( $gc_keyword );                    
 
-                    // $this->log("debug");
                     break;
 
                 /**                
@@ -88,6 +95,12 @@ class GraphCommons {
 
     }
 
+    function gc_api_nodes_search( $url ) {
+        header( 'Content-type: application/json' );
+        echo $this->get_url($url);
+    }
+
+    // shortcode
     function graphcommons_shortcode() {
         $atts = shortcode_atts( array(
             'foo' => 'no foo',
@@ -97,6 +110,7 @@ class GraphCommons {
         return "foo = {$atts['foo']}";        
     }
 
+    // plugin options related functions
     function gc_create_admin_menu() {
         add_options_page(
             'Graph Commons',
@@ -127,24 +141,21 @@ class GraphCommons {
         echo "<input type='text' name='gc-api_key' value='$api_key' class='regular-text'/>";
     }
 
-
+    // options page
     function options_page(){
     ?>
-
-    <div class="wrap">        
-        <h2>Graph Commons Settings</h2>
-        <form action="options.php" method="POST">
-            <?php settings_fields( 'graphcommons-settings-group' ); ?>
-            <?php do_settings_sections( 'graphcommons' ); ?>
-            <?php submit_button(); ?>
-        </form>
-    </div>
-
+        <div class="wrap">        
+            <h2>Graph Commons Settings</h2>
+            <form action="options.php" method="POST">
+                <?php settings_fields( 'graphcommons-settings-group' ); ?>
+                <?php do_settings_sections( 'graphcommons' ); ?>
+                <?php submit_button(); ?>
+            </form>
+        </div>
     <?php
     }
 
-
-
+    // show admin notice if api key is missing
     function gc_admin_notice() {
 
         $api_key = esc_attr( get_option( 'gc-api_key' ) );
@@ -169,31 +180,18 @@ class GraphCommons {
     
     }
 
-    // get url contents with curl
+    // get url contents via curl
     function get_url($url, $method = null) {
 
         $ch = curl_init();
 
-        if ( isset($method) && $method == 'delete' ) {
-    
-            curl_setopt_array($ch, array(
-                CURLOPT_URL => $url,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_SSL_VERIFYHOST => 2,
-                CURLOPT_CUSTOMREQUEST => 'DELETE'
-            ));
-
-        } else {
-
-            curl_setopt_array($ch, array(
-                CURLOPT_URL => $url,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_SSL_VERIFYHOST => 2
-            ));
-
-        }
+        curl_setopt_array($ch, array(
+            CURLOPT_HTTPHEADER      => array( 'Authentication: ' . $this->api_key ),
+            CURLOPT_URL             => $url,
+            CURLOPT_RETURNTRANSFER  => true,
+            CURLOPT_SSL_VERIFYPEER  => false,
+            CURLOPT_SSL_VERIFYHOST  => 2
+        ));
 
         $result = curl_exec($ch);
         curl_close($ch);
