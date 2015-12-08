@@ -18,6 +18,8 @@ class GraphCommons {
     private $plugin_url;
     private $api_key;
     private $api_limit;
+    private $action;
+    private $keyword;
     
     function __construct() 
     {   
@@ -40,21 +42,21 @@ class GraphCommons {
         add_action( 'admin_init', array(&$this, 'gc_admin_init' ) );
         add_action( 'admin_notices', array(&$this, 'gc_admin_notice' ) );
         add_action( 'init',  array(&$this, 'gc_custom_rewrite_tag'), 10, 0 );
+        add_action( 'wp_ajax_get_nodes_json', array(&$this, 'get_nodes_json' ) );
 
         // shortcodes
         add_shortcode('graphcommons', array(&$this, 'graphcommons_shortcode') );
-
 
     } // construct ends
 
     function init() {
 
-        $gc_action          = get_query_var( 'gc_action' );
-        $gc_keyword         = get_query_var( 'gc_keyword' );
+        $this->action          = get_query_var( 'gc_action' );
+        $this->keyword         = get_query_var( 'gc_keyword' );
 
-        if( isset($gc_action) && !empty($gc_action) ) {            
+        if( isset( $this->action ) && !empty( $this->action ) ) {            
 
-            switch ($gc_action) {
+            switch ( $this->action ) {
 
                 /**
                 *
@@ -63,7 +65,7 @@ class GraphCommons {
                 */                
 
                 case 'nodes_search':
-                    $this->gc_api_nodes_search('https://graphcommons.com/api/v1/nodes/search?query='. $gc_keyword . '&limit=' . $this->api_limit);
+                    $this->gc_api_nodes_search('https://graphcommons.com/api/v1/nodes/search?query='. $this->keyword . '&limit=' . $this->api_limit);
                     break;
 
                 /**
@@ -74,8 +76,8 @@ class GraphCommons {
                
                 case 'debug':  
                     
-                    var_dump( $gc_action );
-                    var_dump( $gc_keyword );                    
+                    var_dump( $this->action );
+                    var_dump( $this->keyword );                    
 
                     break;
 
@@ -95,6 +97,17 @@ class GraphCommons {
 
     }
 
+    function get_nodes_json() {
+
+        $keyword = $_POST['keyword'];
+
+        header( 'Content-type: application/json' );
+        $url = 'https://graphcommons.com/api/v1/nodes/search?query='. $keyword . '&limit=' . $this->api_limit;        
+        echo $this->get_url($url);
+        die();
+    }
+
+    // node search
     function gc_api_nodes_search( $url ) {
         header( 'Content-type: application/json' );
         echo $this->get_url($url);
@@ -108,6 +121,16 @@ class GraphCommons {
         ), $atts, 'bartag' );
 
         return "foo = {$atts['foo']}";        
+
+
+/*
+
+<iframe src="https://graphcommons.com/nodes/3fdb29c0-b7b8-4a6b-b3d3-d666588d495b/embed?p=&et=i%C5%9F%20orta%C4%9F%C4%B1d%C4%B1r&g=true" frameborder="0" style="overflow:auto;width:320px;min-width:320px;height:100%;min-height:460px;border:1px solid #CCCCCC;" width="320" height="460"></iframe>
+
+*/
+
+
+
     }
 
     // plugin options related functions
@@ -186,6 +209,16 @@ class GraphCommons {
         </div>
         <?php
     
+    }
+
+    // is curl installed?
+    function _is_curl_installed() {
+        if  (in_array  ('curl', get_loaded_extensions())) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     // get url contents via curl
