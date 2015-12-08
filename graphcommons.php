@@ -124,9 +124,17 @@ class GraphCommons {
     }
 
     function gc_admin_init() {
+        
+        // settings / options pages
         add_settings_section( 'section-one', 'API Credentials', array(&$this, 'section_one_callback'), 'graphcommons' );
         register_setting( 'graphcommons-settings-group', 'gc-api_key' );                    
         add_settings_field( 'gc-api_key', 'api_key', array(&$this, 'field_api_key_callback'), 'graphcommons', 'section-one' );
+        
+        // load js
+        wp_register_script( 'gc-script', plugins_url( '/js/graphcommons.js', __FILE__ ), array('jquery') );
+        wp_localize_script( 'gc-script', 'graphcommons', array('api_key' => $this->api_key ) );
+        wp_enqueue_script( 'gc-script' );
+
     }
 
     function section_one_callback() {
