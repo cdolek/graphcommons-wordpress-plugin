@@ -1,0 +1,36 @@
+#gc_content {
+    padding: 10px 0 0 0;    
+    overflow-y: auto;
+    height: 300px
+}
+
+#gc_content strong {
+    font-weight: bold;
+}
+
+.gc_results {
+    height: 300px;
+    position: static;
+}
+
+.gc_results .gc_row {
+    padding: 5px 10px;
+    margin-bottom: 1px;
+    position: relative;
+    overflow: hidden;
+}
+
+.gc_results .gc_cell {
+    float: left;
+    width: 50%;
+}
+
+.gc_results  .gc_rowHeader,
+.gc_results  .gc_rowHeader .gc_cell {
+    font-size: 9px;
+    background: #f9f9f9;
+}
+
+.gc_results  .gc_row:hover {
+    background: #f5f5f5;
+}
