@@ -2,12 +2,12 @@
 /*
 Plugin Name: Graph Commons
 Plugin URI: http://binfil.com
-Description: This plugin helps you find and insert node cards into your blog
+Description: This plugin helps you find and insert node cards into your blog using Graph Commons API.
 Version: 1.0.0
 Author: Cenk Dolek
 Text Domain: graphcommons
-Domain Path: /languages
-Author URI: http://binfil.com
+Domain Path: /lang
+Author URI: http://cenkdolek.com
 Author Email: cdolek@gmail.com
 License: GPL2
 */
@@ -17,6 +17,7 @@ if ( ! defined( 'WPINC' ) ) {
     die;
 }
 
+// GC Class
 class GraphCommons {
 
     private $plugin_path;
@@ -32,14 +33,14 @@ class GraphCommons {
         $this->plugin_path          = plugin_dir_path( __FILE__ );
         $this->plugin_url           = plugin_dir_url( __FILE__ );
         $this->api_key              = esc_attr( get_option( 'gc-api_key' ) );
-        $this->api_limit            = 10;
+        $this->api_limit            = 20;
 
         // Set up activation hooks
         register_activation_hook( __FILE__, array(&$this,   'activate') );
         register_deactivation_hook( __FILE__, array(&$this, 'deactivate') );
 
         // Set up l10n        
-        load_plugin_textdomain( 'graphcommons', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );                
+        load_plugin_textdomain( 'graphcommons', false, dirname( plugin_basename( __FILE__ ) ) . '/lang' );                
 
         // actions */
         add_action( 'pre_get_posts', array(&$this, 'init') );
@@ -48,7 +49,6 @@ class GraphCommons {
         add_action( 'admin_notices', array(&$this, 'gc_admin_notice' ) );
         add_action( 'init',  array(&$this, 'gc_custom_rewrite_tag'), 10, 0 );
         add_action( 'wp_ajax_get_nodes_json', array(&$this, 'get_nodes_json' ) );
-        add_action( 'media_buttons', array(&$this, 'add_graphcommons_button') , 50);
 
         add_action( 'admin_footer', array(&$this, 'gc_link_dialog' ) ) ;
         
@@ -148,10 +148,6 @@ class GraphCommons {
     }
 
 
-    function add_graphcommons_button() {
-        echo '<a href="#" id="insert-graphcommons-media" class="button">Add my media</a>';
-    }
-
     // plugin options related functions
     function gc_create_admin_menu() {
         add_options_page(
@@ -173,10 +169,17 @@ class GraphCommons {
         add_settings_field( 'gc-api_key', 'api_key', array(&$this, 'field_api_key_callback'), 'graphcommons', 'section-one' );
         
         // load javascript
-        wp_register_script( 'knockoutjs', plugins_url( '/js/knockout.min.js', __FILE__ ), array('jquery') );
-        wp_register_script( 'gc-script', plugins_url( '/js/graphcommons.js', __FILE__ ), array('jquery') );
+        wp_register_script( 'knockoutjs', plugins_url( '/js/knockout.min.js', __FILE__ ), array('jquery'), '3.4.0', true );
+        wp_register_script( 'gc-script', plugins_url( '/js/graphcommons.js', __FILE__ ), array('jquery'), '1.0.0', true );
+
         wp_localize_script( 'gc-script', 'graphcommons', array('api_key' => $this->api_key, 'plugin_url' => $this->plugin_url ) );
-        wp_enqueue_script( array( 'knockoutjs', 'gc-script' ) );            
+        
+        wp_enqueue_script( array( 'knockoutjs', 'gc-script' ) );
+
+        // load styles
+        wp_register_style( 'gc-style', plugins_url('css/graphcommons.css', __FILE__) );        
+        wp_enqueue_style( 'gc-style' );
+
     }
 
     function section_one_callback() {
