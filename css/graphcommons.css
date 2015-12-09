@@ -1,7 +1,7 @@
 #gc_content {
     padding: 10px 0 0 0;    
     overflow-y: auto;
-    height: 300px
+    height: 493px
 }
 
 #gc_content strong {
@@ -38,7 +38,6 @@
 }
 
 /* search results etc */
-
 
 .gc_content .tt-suggestion p {
     font-family: inherit;
@@ -123,6 +122,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
 
+    max-width: 300px;
 
 }
 
@@ -134,4 +134,14 @@
 .gc_content .tt-suggestion p span.type,
 .gc_content .tt-suggestion p span.graph {
     margin-top: 20px;
+}
+
+.gc_content .tt-suggestion:hover {
+    background: #DEDEDE;
+    cursor: pointer;
+}
+
+.gc_content .tt-suggestion.tt-cursor {
+    color: #fff;
+    background-color: #DEDEDE;
 }
