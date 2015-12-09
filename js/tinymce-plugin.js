@@ -1,11 +1,9 @@
-    var win;
-
-
 jQuery(function ($) {
     
     'use strict';
 
     var
+    cache = {},
     keyword,
     typingTimer,
     doneTypingInterval  = 1000;
@@ -19,8 +17,6 @@ jQuery(function ($) {
     function AppViewModel() {
 
         var self = this;
-
-        self.a = ko.observable("1");
 
         self.people = ko.observableArray([
             { firstName: 'Bert', lastName: 'Bertington' },
@@ -55,13 +51,11 @@ jQuery(function ($) {
                         {
                             type    : 'textbox', 
                             name    : 'search', 
-                            label   : 'Keyword'
                         },
                         {
                             type    : 'container',
                             name    : 'container',
-                            // html   : '<div class="wrap"><input type="search" placeholder="Keyword" class="regular-text" autocomplete="off" id="gc_text_input"><div id="gc_content"></div></div>'
-                            html    : '<div id="gc_content">Hello</div>',
+                            html    : '<div id="gc_content" class="gc_content">Type something...</div>',
                         }
                     ],
 
@@ -86,36 +80,6 @@ jQuery(function ($) {
                     }
                 });
 
-
-
-
-/*
-                // Open window
-                win = editor.windowManager.open({
-                    width: 600,
-                    height: 400,
-                    title: 'Graph Commons',
-                    body: [
-                        {
-                            type: 'textbox', 
-                            name: 'title', 
-                            label: 'Keyword',
-                        },
-                        {
-                            type   : 'container',
-                            name   : 'container',
-                            html   : '<p>Hey</p><hr/><pre data-bind="text: ko.toJSON($data, null, 2)"></pre>'
-                        }
-                    ],
-                    onsubmit: function(e) {
-                        // Insert content when the window form is submitted
-                        editor.insertContent('Title: ' + e.data.title);
-                    }
-                });
-*/
-
-
-                // jQuery(win.$el).find('input').attr('id')
             }
         });
 
@@ -125,29 +89,43 @@ jQuery(function ($) {
     function doneTyping () {
 
         if ( keyword.trim() === '' || keyword.length < 3 ) {
-            console.log("keyword not ok");
+            return;
+        }
+
+        if( typeof cache[keyword] !== 'undefined' ) {
+            drawToDom( cache[keyword] );
+            console.log('> got ', keyword, ' from cache!');
             return;
         }
 
         $.ajax({
-            type : "post",
-            dataType : "json",
-            url : ajaxurl,
-            data : {
-            action: "get_nodes_json",
-            keyword: keyword
-        },
+            type        : "post",
+            dataType    : "json",
+            url         : ajaxurl,
+            data        : 
+                {
+                    action: "get_nodes_json",
+                    keyword: keyword
+                },
             success: function(response) {
-                console.log( response );
+                if ( response.nodes.length > 0 ) {
+                    drawToDom( response.nodes );
+                    cache[keyword] = response.nodes;
+                } else {
+                    $('#gc_content').html('No results found for <strong>' + keyword + '</strong>.');
+                }
+                console.log('> got ', response.nodes.length, ' results from the api');
             }
         });
 
 
 
+        /*
         var html = '<div id="most-recent-results" class="query-results" tabindex="0"><div class="query-notice" id="query-notice-message"><em class="query-notice-default">No search term specified. Showing recent items.</em><em class="query-notice-hint screen-reader-text">Search or use up and down arrow keys to select an item.</em></div><ul><li class="alternate"><input type="hidden" class="item-permalink" value="http://local.blank.dev/instagram_post/1135110432720502733_1922582382/"><span class="item-title">1135110432720502733_1922582382</span><span class="item-info">Instagram Post</span></li><li><input type="hidden" class="item-permalink" value="http://local.blank.dev/sample-page/"><span class="item-title">Sample Page</span><span class="item-info">Page</span></li><li class="alternate"><input type="hidden" class="item-permalink" value="http://local.blank.dev/hello-world/"><span class="item-title">Hello world!</span><span class="item-info">2015/04/17</span></li></ul><div class="river-waiting"><span class="spinner"></span></div></div>';
 
 
         $('#gc_content').html( html );
+        */
 
 
 
@@ -163,6 +141,15 @@ jQuery(function ($) {
 
 
 
+    function drawToDom( nodes ) {
+        var html = '<div class="gc_results"><div class="gc_row gc_rowHeader"><div class="gc_cell">Node Name</div><div class="gc_cell">Node Type</div></div>';
+        for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            html += '<div class="gc_row"><div class="gc_cell">' + node.name + '</div><div class="gc_cell">' + node.nodetype.name + '</div></div>';
+        }
+        html += '</div>';
+        $('#gc_content').html( html );        
+    }
 
 
 
