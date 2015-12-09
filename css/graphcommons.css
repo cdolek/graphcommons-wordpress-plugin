@@ -23,6 +23,8 @@
 .gc_results .gc_cell {
     float: left;
     width: 50%;
+    font-size: 18px;
+    line-height: 52px;
 }
 
 .gc_results  .gc_rowHeader,
@@ -33,4 +35,103 @@
 
 .gc_results  .gc_row:hover {
     background: #f5f5f5;
+}
+
+/* search results etc */
+
+
+.gc_content .tt-suggestion p {
+    font-family: inherit;
+    font-weight: normal;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+    text-rendering: optimizeLegibility;
+}
+
+.gc_content .tt-suggestion {
+    font-family: "ff-tisa-web-pro", Georgia, serif;
+    padding: 0 5px;
+    height: 54px;
+    line-height: 52px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.gc_content .type-icon {
+    display: block;
+    float: left;
+    width: 32px;
+    height: 32px;
+    border-radius: 100%;
+    margin-top: 11px;
+    margin-right: 16px;
+    margin-left: 6px;
+    text-align: center;
+    font-family: 'Apercu Bold Pro', sans-serif;
+    line-height: 32px;
+    color: #FFF;
+    background: #4d504e;
+}
+
+.gc_content .tt-suggestion p {
+    margin: 0;
+    color: #222;
+    width: 100%;
+    display: inline-block;
+    white-space: nowrap !important;
+    overflow: hidden;
+    text-overflow: ellipsis;    
+    white-space: normal;
+}
+
+.gc_content .tt-suggestion p span.name {
+    font-size: 18px;
+    padding-bottom: 10px;
+}
+
+.gc_content .tt-highlight {
+    font-family: "ff-tisa-web-pro", Georgia, serif;
+    border-bottom: 2px solid #FFBE25;
+    font-size: 18px;
+}
+
+.gc_content .tt-suggestion p span.type, 
+.gc_content .node-context span.type {
+    color: #A9A9A9;
+    font-size: 14px;
+    margin-left: 4px;
+    margin-right: 4px;
+    text-align: center;
+}
+
+.gc_content .tt-suggestion p span.graph, 
+.gc_content .node-context span.graph {
+    color: #444;
+    font-size: 14px;
+    font-style: italic;
+}
+
+.gc_content .tt-suggestion p span.type,
+.gc_content .tt-suggestion p span.name,
+.gc_content .tt-suggestion p span.graph {
+    float: left;
+    margin-right: 7px;
+    margin-top: 16px;
+
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+
+}
+
+.gc_content .tt-suggestion p span.name {
+    max-width: 200px;
+}
+
+
+.gc_content .tt-suggestion p span.type,
+.gc_content .tt-suggestion p span.graph {
+    margin-top: 20px;
 }

@@ -55,7 +55,8 @@ jQuery(function ($) {
                         {
                             type    : 'container',
                             name    : 'container',
-                            html    : '<div id="gc_content" class="gc_content">Type something...</div>',
+                            // html    : '<div id="gc_content" class="gc_content">Type something...</div>',
+                            html    : '<div id="gc_content" class="gc_content"><div class="tt-suggestion"><p title="Tunisia as Country in Penal Systems Network" style="white-space: normal;"><span class="type-icon" style="background-color: #4d504e">C</span><span class="name">T<span class="tt-highlight">uni</span>sia</span><span class="type">Country in</span><span class="graph">Penal Systems Network</span></p></div></div>'
                         }
                     ],
 
@@ -68,6 +69,7 @@ jQuery(function ($) {
 
                         $(textbox).attr('placeholder', 'Search keyword');
                         $(textbox).attr('type', 'search');
+                        $(textbox).css('padding-left', '10px');
                         
                         $(textbox).on('keyup', function(){
                             keyword = $(this).val().trim();
@@ -140,18 +142,24 @@ jQuery(function ($) {
     }
 
 
-
     function drawToDom( nodes ) {
-        var html = '<div class="gc_results"><div class="gc_row gc_rowHeader"><div class="gc_cell">Node Name</div><div class="gc_cell">Node Type</div></div>';
+        var html = '<div class="gc_results">';
         for (var i = 0; i < nodes.length; i++) {
             var node = nodes[i];
-            html += '<div class="gc_row"><div class="gc_cell">' + node.name + '</div><div class="gc_cell">' + node.nodetype.name + '</div></div>';
+            // html += '<div class="gc_row"><div class="gc_cell">' + node.name + '</div><div class="gc_cell">' + node.nodetype.name + '</div></div>';
+            html += '<div class="tt-suggestion"><p><span class="type-icon" style="background-color: #4d504e">'+node.nodetype.name.charAt(0)+'</span>';
+            html += '<span class="name" title="'+node.name+'">'+highlightKeyword( node.name )+'</span>';
+            html += '<span class="type">'+node.nodetype.name+' in</span>';
+            html += '<span class="graph">Penal Systems Network</span></p></div>';
         }
         html += '</div>';
         $('#gc_content').html( html );        
     }
 
-
+    function highlightKeyword( text ) {
+        var searchTextRegExp = new RegExp(keyword , "i"); //  case insensitive regexp
+        return text.replace(searchTextRegExp , '<span class="tt-highlight">$&</span>');
+    }
 
 
 
