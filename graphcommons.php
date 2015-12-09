@@ -12,6 +12,11 @@ Author Email: cdolek@gmail.com
 License: GPL2
 */
 
+// If this file is called directly, abort.
+if ( ! defined( 'WPINC' ) ) {
+    die;
+}
+
 class GraphCommons {
 
     private $plugin_path;
@@ -43,9 +48,18 @@ class GraphCommons {
         add_action( 'admin_notices', array(&$this, 'gc_admin_notice' ) );
         add_action( 'init',  array(&$this, 'gc_custom_rewrite_tag'), 10, 0 );
         add_action( 'wp_ajax_get_nodes_json', array(&$this, 'get_nodes_json' ) );
+        add_action( 'media_buttons', array(&$this, 'add_graphcommons_button') , 50);
 
+        add_action( 'admin_footer', array(&$this, 'gc_link_dialog' ) ) ;
+        
         // shortcodes
         add_shortcode('graphcommons', array(&$this, 'graphcommons_shortcode') );
+
+        // filters
+        add_filter( 'mce_external_plugins', array( &$this, 'graphcommons_add_button' ) );
+        add_filter( 'mce_buttons', array( &$this, 'graphcommons_register_button' ) );        
+
+
 
     } // construct ends
 
@@ -60,7 +74,7 @@ class GraphCommons {
 
                 /**
                 *
-                *   API Endpoints
+                *   GC API Endpoints
 
                 */                
 
@@ -75,7 +89,7 @@ class GraphCommons {
                 */                
                
                 case 'debug':  
-                    
+                    // http://yoursite/graphcommons_api/action/keyword/
                     var_dump( $this->action );
                     var_dump( $this->keyword );                    
 
@@ -133,6 +147,11 @@ class GraphCommons {
 
     }
 
+
+    function add_graphcommons_button() {
+        echo '<a href="#" id="insert-graphcommons-media" class="button">Add my media</a>';
+    }
+
     // plugin options related functions
     function gc_create_admin_menu() {
         add_options_page(
@@ -153,11 +172,11 @@ class GraphCommons {
         register_setting( 'graphcommons-settings-group', 'gc-api_key' );                    
         add_settings_field( 'gc-api_key', 'api_key', array(&$this, 'field_api_key_callback'), 'graphcommons', 'section-one' );
         
-        // load js
+        // load javascript
+        wp_register_script( 'knockoutjs', plugins_url( '/js/knockout.min.js', __FILE__ ), array('jquery') );
         wp_register_script( 'gc-script', plugins_url( '/js/graphcommons.js', __FILE__ ), array('jquery') );
-        wp_localize_script( 'gc-script', 'graphcommons', array('api_key' => $this->api_key ) );
-        wp_enqueue_script( 'gc-script' );
-
+        wp_localize_script( 'gc-script', 'graphcommons', array('api_key' => $this->api_key, 'plugin_url' => $this->plugin_url ) );
+        wp_enqueue_script( array( 'knockoutjs', 'gc-script' ) );            
     }
 
     function section_one_callback() {
@@ -239,6 +258,19 @@ class GraphCommons {
         return $result;
     }
 
+    public function graphcommons_add_button( $plugin_array ) {
+        $plugin_array['graphcommons'] = plugins_url( '/js/tinymce-plugin.js',__FILE__ );
+        return $plugin_array;
+    }
+    
+    public function graphcommons_register_button( $buttons ) {
+        array_push( $buttons, 'seperator', 'graphcommons' );
+        return $buttons;
+    }
+
+
+
+
     function gc_add_rewrite_rules() {
         add_rewrite_rule('^graphcommons_api/([^/]*)/([^/]*)/?','index.php?gc_action=$matches[1]&gc_keyword=$matches[2]','top');        
     }
@@ -257,6 +289,22 @@ class GraphCommons {
     function deactivate(){        
         flush_rewrite_rules();
     }
+
+
+    function gc_link_dialog() {
+        $search_panel_visible = '1';
+        // display: none is required here, see #WP27605
+        ?>
+        <div id="graphcommons_debug">
+            <pre data-bind="text: ko.toJSON($data, null, 2)"></pre>
+        </div>
+        <?php
+    }
+
+
+
+
+
 
 } // class end
 
