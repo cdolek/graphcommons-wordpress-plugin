@@ -52,12 +52,17 @@ class GraphCommons {
 
         add_action( 'admin_footer', array(&$this, 'gc_link_dialog' ) ) ;
         
+        add_action( 'media_buttons', array( &$this, 'media_buttons' ), 11 );
+
+
         // shortcodes
         add_shortcode('graphcommons', array(&$this, 'graphcommons_shortcode') );
 
         // filters
         add_filter( 'mce_external_plugins', array( &$this, 'graphcommons_add_button' ) );
         add_filter( 'mce_buttons', array( &$this, 'graphcommons_register_button' ) );        
+    
+        add_filter( 'mce_css', array(&$this, 'gc_mce_css' ) );
 
 
 
@@ -127,26 +132,14 @@ class GraphCommons {
         echo $this->get_url($url);
     }
 
-    // shortcode
-    function graphcommons_shortcode() {
+    // graphcommons shortcode
+    function graphcommons_shortcode( $atts ) {
         $atts = shortcode_atts( array(
-            'foo' => 'no foo',
-            'baz' => 'default baz'
-        ), $atts, 'bartag' );
-
-        return "foo = {$atts['foo']}";        
-
-
-/*
-
-<iframe src="https://graphcommons.com/nodes/3fdb29c0-b7b8-4a6b-b3d3-d666588d495b/embed?p=&et=i%C5%9F%20orta%C4%9F%C4%B1d%C4%B1r&g=true" frameborder="0" style="overflow:auto;width:320px;min-width:320px;height:100%;min-height:460px;border:1px solid #CCCCCC;" width="320" height="460"></iframe>
-
-*/
-
-
-
+            'id'    => 'id',
+            'name'  => 'name'
+        ), $atts, 'graphcommons' );
+        return '<iframe src="https://graphcommons.com/nodes/'.$atts["id"].'/embed?p=&et=i%C5%9F%20orta%C4%9F%C4%B1d%C4%B1r&g=true" frameborder="0" style="overflow:auto;width:320px;min-width:320px;height:100%;min-height:460px;border:1px solid #CCCCCC;" width="320" height="460"></iframe>';
     }
-
 
     // plugin options related functions
     function gc_create_admin_menu() {
@@ -261,18 +254,29 @@ class GraphCommons {
         return $result;
     }
 
-    public function graphcommons_add_button( $plugin_array ) {
+    function media_buttons() {
+        echo '<a href="#" id="insert-graphcommons-node" class="button"><span class="dashicons dashicons-edit" style="margin-top: 3px;"></span> Insert Graph Commons Node Card</a>';
+    }
+
+    // custom editor style
+    function gc_mce_css( $mce_css ) {
+        if ( ! empty( $mce_css ) )
+            $mce_css .= ',';
+
+        $mce_css .= plugins_url( '/css/graphcommons_tinymce_style.css', __FILE__ );
+
+        return $mce_css;
+    }
+
+    function graphcommons_add_button( $plugin_array ) {
         $plugin_array['graphcommons'] = plugins_url( '/js/tinymce-plugin.js',__FILE__ );
         return $plugin_array;
     }
     
-    public function graphcommons_register_button( $buttons ) {
+    function graphcommons_register_button( $buttons ) {
         array_push( $buttons, 'seperator', 'graphcommons' );
         return $buttons;
     }
-
-
-
 
     function gc_add_rewrite_rules() {
         add_rewrite_rule('^graphcommons_api/([^/]*)/([^/]*)/?','index.php?gc_action=$matches[1]&gc_keyword=$matches[2]','top');        
@@ -293,7 +297,6 @@ class GraphCommons {
         flush_rewrite_rules();
     }
 
-
     function gc_link_dialog() {
         $search_panel_visible = '1';
         // display: none is required here, see #WP27605
@@ -303,10 +306,6 @@ class GraphCommons {
         </div>
         <?php
     }
-
-
-
-
 
 
 } // class end
