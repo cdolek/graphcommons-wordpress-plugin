@@ -145,3 +145,7 @@
     color: #fff;
     background-color: #DEDEDE;
 }
+
+.html-active #insert-graphcommons-node {
+    display: none;
+}

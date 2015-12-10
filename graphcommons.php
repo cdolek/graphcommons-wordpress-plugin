@@ -134,11 +134,24 @@ class GraphCommons {
 
     // graphcommons shortcode
     function graphcommons_shortcode( $atts ) {
+
         $atts = shortcode_atts( array(
             'id'    => 'id',
-            'name'  => 'name'
+            'name'  => 'name',
+            'type'  => '',
+            'embed' => 'node'
         ), $atts, 'graphcommons' );
-        return '<iframe src="https://graphcommons.com/nodes/'.$atts["id"].'/embed?p=&et=i%C5%9F%20orta%C4%9F%C4%B1d%C4%B1r&g=true" frameborder="0" style="overflow:auto;width:320px;min-width:320px;height:100%;min-height:460px;border:1px solid #CCCCCC;" width="320" height="460"></iframe>';
+
+        switch ( $atts['embed'] ) {
+            case 'node':
+                $html = '<iframe src="https://graphcommons.com/nodes/'.$atts["id"].'/embed?p=&et=i%C5%9F%20orta%C4%9F%C4%B1d%C4%B1r&g=true" frameborder="0" style="overflow:auto;width:320px;min-width:320px;height:100%;min-height:460px;border:1px solid #CCCCCC;" width="320" height="460"></iframe>';
+                break;            
+            default:
+                $html = '<strong>Error:</strong> Unknown embed type - Graph Commons Wordpress Plugin';
+                break;
+        }
+
+        return $html;
     }
 
     // plugin options related functions

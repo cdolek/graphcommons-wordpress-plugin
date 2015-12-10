@@ -6,7 +6,10 @@ jQuery(function ($) {
     cache = {},
     keyword,
     typingTimer,
-    doneTypingInterval  = 1000;
+    selectedNode,
+    gcwindow,
+    working = false,
+    doneTypingInterval  = 500;
 
     /**
     *
@@ -32,17 +35,90 @@ jQuery(function ($) {
 
     window.gcmodel = gcmodel;
 
-
+    /* TinyMCE Plugin */
     tinymce.PluginManager.add('graphcommons', function(editor, url) {
+       
+        var sh_tag = 'graphcommons';
+
+        //helper functions 
+        function getAttr(s, n) {
+            n = new RegExp(n + '=\"([^\"]+)\"', 'g').exec(s);
+            return n ?  window.decodeURIComponent(n[1]) : '';
+        }
+
+        function html( cls, data ,con) {
+            var placeholder = url + '../../images/gc_nodecard.png';
+            var gc_id = getAttr(data, 'id');
+            var gc_node_name = getAttr(data, 'name');
+            var gc_node_type = getAttr(data, 'type');
+
+            data = window.encodeURIComponent( data );
+            return '<p class="gc_placeholder"><span class="gc_placeholder_title mceNonEditable" contentEditable="false">'+gc_node_name+'</span><span class="gc_placeholder_type">'+gc_node_type+'</span><img src="' + placeholder + '" class="mceItem ' + cls + '" ' + 'data-sh-attr="' + data + '" data-mce-resize="false" data-mce-placeholder="1"/></p>';
+            // return '<img src="' + placeholder + '" title="'+gc_node_name+'" class="mceItem ' + cls + '" ' + 'data-sh-attr="' + data + '" data-mce-resize="false" data-mce-placeholder="1" />';
+        }
+
+        function replaceShortcodes( content ) {
+/*
+            return content.replace( /\[graphcommons([^\]]*)\]([^\]]*)\[\/graphcommons\]/g, function( all,attr,con) {
+                return html( 'wp-graphcommons', attr , con);
+            });
+*/
 
 
-        editor.addButton('graphcommons', {
-            text: 'Add GraphCommons Node Card',
-            icon: false,
-            onclick: function() {
 
-                editor.windowManager.open({
-                    title: 'Graph Commons - Find Node',
+            // var re = /(<div class="gc_placeholder"(?: \w+="[^"]+")*>([^<]*)<\/div>)/g;
+            // // var str = 'this is a string <a href="#" class="link">link</a> <a class="link">link2</a>';
+
+            // var links = [];
+            // for (var i in content.match(re)) {
+            //     links.push(content.match(re)[i]);
+            // }
+
+            // var embedded_strings = [];
+            // for (var s in links) {
+            //     embedded_strings.push(links[s].replace(re, "$2"));
+            // }
+
+            // console.log('links', links);
+            // console.log('embedded_strings', embedded_strings);
+
+            /* content.replace(/<div class="gc_placeholder"[^>]*>.*?<\/div>/g,"") */
+
+            return content.replace( /\[graphcommons([^\]]*)\]([^\]]*)\[\/graphcommons\]/g, function( all,attr,con) {                
+                return html( 'wp-graphcommons', attr , con);
+            });
+
+        }
+
+        function restoreShortcodes( content ) {
+            
+            content = content.replace(/(\r\n|\n|\r)/gm,"");            
+
+//            return content.replace( /(?:<p(?: [^>]+)?>)*(<img [^>]+>)(?:<\/p>)*/g, function( match, image ) {
+
+            return content.replace( /<p class="gc_placeholder">(.*?>)\<\/p>/g, function( match, image ) {
+
+                var data = getAttr( image, 'data-sh-attr' );
+                var con = getAttr( image, 'data-sh-content' );
+                
+                if ( data ) {
+                    console.log("restoreShortcodes__________________________________________________");                    
+                    return '<p>[' + sh_tag + data + ']' + con + '[/'+sh_tag+']</p>';
+                }
+            
+                console.log("/////////////////////////////////////////////////////////");
+                console.log("restoreShortcodes match:", match );
+
+                // editor.setContent( match.replace( /<div class="gc_placeholder">(.*?>)\<\/div>/g, '') );
+                
+                return  match;
+            
+            });
+
+        }
+
+        gcwindow = {
+                    title: 'Add Graph Commons Node Card',
                     // url: graphcommons.plugin_url + '/mydialog.html',
                     // html: '<div id="gc_content"></div>',
                     width: 800,
@@ -75,30 +151,68 @@ jQuery(function ($) {
                             keyword = $(this).val().trim();
                             clearTimeout(typingTimer);
                             typingTimer = setTimeout(doneTyping, doneTypingInterval);
+                            console.log("typing");
                         });
 
-                        window.maw = self;
+                        $(document).one('click', '.tt-suggestion', function(e){
+                            e.preventDefault();
+                            var data = $(this).data();
+                            editor.execCommand('mceInsertContent', false, '[graphcommons embed="node" id="'+data.gcId+'" name="'+data.gcName+'" type="'+data.gcNodeType+'"][/graphcommons]');
+                            self.close();
+                            console.log("data",data);
+                        } );            
 
                     }
-                });
+                };
 
+        editor.addCommand('open_window', function() {
+            editor.windowManager.open(gcwindow);
+        });
+/*        
+        editor.addButton('graphcommons', {
+            text: 'Add Graph Commons Node Card',
+            icon: false,
+            cmd: 'open_window'
+        });
+*/
+        // replace from shortcode to an image placeholder
+        editor.on('BeforeSetcontent', function(event){ 
+            event.content = replaceShortcodes( event.content );
+        });
+
+        // replace from image placeholder to shortcode
+        editor.on('GetContent', function(event){
+            event.content = restoreShortcodes(event.content);
+        });
+
+        $(document).on('click', '#insert-graphcommons-node', function(e){
+            e.preventDefault();
+            editor.execCommand('open_window');
+        });
+
+        // contentEditable bug copying the last class used! remove it when enter key is pressed!
+        tinyMCE.editors.content.on('keyup',function(e){
+            if ( 13 === e.keyCode ) {
+               $(tinyMCE.editors.content.selection.getNode()).closest('p').removeAttr('class');
             }
         });
 
-    });
+    }); // tinymce plugin
 
     /* user has "finished typing"  */
     function doneTyping () {
 
-        if ( keyword.trim() === '' || keyword.length < 3 ) {
+        if ( keyword.trim() === '' || keyword.length < 3 || working === true ) {
             return;
         }
 
         if( typeof cache[keyword] !== 'undefined' ) {
             drawToDom( cache[keyword] );
-            console.log('> got ', keyword, ' from cache!');
+            console.log('> got ', keyword, ' from cache!');        
             return;
         }
+
+        $('#gc_content').html('<img src="'+graphcommons.plugin_url+'/images/spinner.gif">');
 
         $.ajax({
             type        : "post",
@@ -109,6 +223,9 @@ jQuery(function ($) {
                     action: "get_nodes_json",
                     keyword: keyword
                 },
+            beforeSend: function(){
+                working = true;
+            },
             success: function(response) {
                 if ( response.nodes.length > 0 ) {
                     drawToDom( response.nodes );
@@ -122,50 +239,35 @@ jQuery(function ($) {
             }
         });
 
-
-
-        /*
-        var html = '<div id="most-recent-results" class="query-results" tabindex="0"><div class="query-notice" id="query-notice-message"><em class="query-notice-default">No search term specified. Showing recent items.</em><em class="query-notice-hint screen-reader-text">Search or use up and down arrow keys to select an item.</em></div><ul><li class="alternate"><input type="hidden" class="item-permalink" value="http://local.blank.dev/instagram_post/1135110432720502733_1922582382/"><span class="item-title">1135110432720502733_1922582382</span><span class="item-info">Instagram Post</span></li><li><input type="hidden" class="item-permalink" value="http://local.blank.dev/sample-page/"><span class="item-title">Sample Page</span><span class="item-info">Page</span></li><li class="alternate"><input type="hidden" class="item-permalink" value="http://local.blank.dev/hello-world/"><span class="item-title">Hello world!</span><span class="item-info">2015/04/17</span></li></ul><div class="river-waiting"><span class="spinner"></span></div></div>';
-
-
-        $('#gc_content').html( html );
-        */
-
-
-
-
-
-
-
-
-
-
         console.log( 'finished typing' );
     }
 
 
     function drawToDom( nodes ) {
+
         var html = '<div class="gc_results">';
+
         for (var i = 0; i < nodes.length; i++) {
+
             var node = nodes[i];
             var graphname = node.graphs.length > 0 && node.graphs[0].name !== null ? node.graphs[0].name : "Untitled Graph";
 
-            // html += '<div class="gc_row"><div class="gc_cell">' + node.name + '</div><div class="gc_cell">' + node.nodetype.name + '</div></div>';
-            html += '<div class="tt-suggestion"><p><span class="type-icon" style="background-color: '+node.nodetype.color+'">' + node.nodetype.name.charAt(0) + '</span>';
+            html += '<div class="tt-suggestion" data-gc-id="'+node.id+'" data-gc-name="'+node.name+'" data-gc-node-type="'+node.nodetype.name+'"><p><span class="type-icon" style="background-color: '+node.nodetype.color+'">' + node.nodetype.name.charAt(0) + '</span>';
             html += '<span class="name" title="'+node.name+'">' + highlightKeyword( node.name ) + '</span>';
             html += '<span class="type">' + node.nodetype.name + ' in</span>';
             html += '<span class="graph">'+ graphname + '</span></p></div>';
-            // typeof node.graphs[0].name !== 'undefined' ? node.graphs[0].name : "Untitled Graph"
         }
+
         html += '</div>';
+
         $('#gc_content').html( html );        
+
+        working = false;
     }
 
     function highlightKeyword( text ) {
         var searchTextRegExp = new RegExp(keyword , "i"); //  case insensitive regexp
         return text.replace(searchTextRegExp , '<span class="tt-highlight">$&</span>');
     }
-
-
 
 }); // jQuery ends
