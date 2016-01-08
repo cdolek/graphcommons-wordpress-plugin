@@ -20,6 +20,12 @@ Supported Languages
 * English
 * Turkish
 
+ToDo
+------------
+* oembed implementation
+* graph search and embedding
+
+
 Contributing
 ------------
 
