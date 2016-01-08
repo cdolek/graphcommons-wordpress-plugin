@@ -23,5 +23,4 @@ License
 -------
 
 Copyright 2015 [Graph Commons](https://graphcommons.com)
-
-Licensed under Apache License Version 2.0.  Details in the attached LICENSE file.
+Released under the MIT License
