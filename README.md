@@ -9,6 +9,17 @@ Requirements
 * A working wordpress installation
 * Curl enabled on your server
 
+Usage
+------
+After installing, go to Settings->Graph Commons and add your API key. Then go to add new post page and you will see a new button.
+
+
+Supported Languages
+-------------------
+
+* English
+* Turkish
+
 Contributing
 ------------
 
