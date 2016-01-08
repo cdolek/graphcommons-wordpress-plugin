@@ -1,6 +1,6 @@
 # Graph Commons plugin for WordPress
 
-The Graph Commons plugin for WordPress allows you to insert nodes from Graph Commons.
+The Graph Commons plugin for WordPress allows you to insert nodes from Graph Commons to your posts.
 
 Requirements
 --------
