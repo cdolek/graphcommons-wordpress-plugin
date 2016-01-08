@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-08 18:14-0500\n"
+"POT-Creation-Date: 2016-01-08 18:18-0500\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -37,8 +37,8 @@ msgid "Search keyword"
 msgstr "Anahtar kelime"
 
 #: graphcommons.php:193
-msgid "Type something, results will be displayed here."
-msgstr "Yazmaya başlayın, sonuçlar burada görüntülenecek."
+msgid "Type something, results will be displayed here"
+msgstr "Bir şeyler yazın, sonuçlar burada görüntülenecek"
 
 #: graphcommons.php:194 graphcommons.php:287
 msgid "Insert Graph Commons Node Card"
@@ -61,5 +61,5 @@ msgstr ""
 "Lütfen <a href=\"%1$s\">Graph Commons Plugin Ayarları sayfasını</a>  ziyaret "
 "edip API anahtarınızı girin"
 
-#~ msgid "Type something, results will be displayed here"
-#~ msgstr "Bir şeyler yazın, sonuçlar burada görüntülenecek."
+#~ msgid "Type something, results will be displayed here."
+#~ msgstr "Yazmaya başlayın, sonuçlar burada görüntülenecek."

@@ -190,7 +190,7 @@ class GraphCommons {
             'language'      => array(                
                 'hubsearchtext' => __('Select if you would like to search in hubs','graphcommons'),
                 'searchkeyword' => __('Search keyword', 'graphcommons'),
-                'typesomething' => __('Type something, results will be displayed here.'),
+                'typesomething' => __('Type something, results will be displayed here'),
                 'addgcnodecard' => __('Insert Graph Commons Node Card', 'graphcommons'),
                 'noresultsfound' => __('No results found for:', 'graphcommons')
             )
