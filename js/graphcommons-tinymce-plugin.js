@@ -132,7 +132,7 @@ jQuery(function ($) {
                 };
             }
             editor.windowManager.open( {
-                title: 'NEW GC',
+                title: graphcommons.language.addgcnodecard,
                 width: 800,
                 height: 580,
                 buttons: [],
@@ -141,7 +141,7 @@ jQuery(function ($) {
                     var self = this;
                     textbox = $('#'+self._id).find('input');                    
 
-                    $(textbox).attr('placeholder', 'Search keyword');
+                    $(textbox).attr('placeholder', graphcommons.language.searchkeyword);
                     $(textbox).attr('type', 'search');
                     $(textbox).css('padding-left', '10px');
                     
@@ -184,7 +184,7 @@ jQuery(function ($) {
                         {
                             type    : 'container',
                             name    : 'container',
-                            html    : '<div id="gc_content" class="gc_content">Type something, results will be displayed here.</div>',
+                            html    : '<div id="gc_content" class="gc_content">' + graphcommons.language.typesomething + '</div>',
                         },
 
                     ],
