@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-08 17:10-0500\n"
+"POT-Creation-Date: 2016-01-08 17:54-0500\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -28,23 +28,34 @@ msgstr ""
 "<strong>Hata:</strong> Bu embed türü tanınmıyor - Graph Commons Wordpress "
 "Plugin"
 
-#: graphcommons.php:192
+#: graphcommons.php:191
 msgid "Select if you would like to search in hubs"
 msgstr "Hub’larda arama yapmak için seçiniz"
 
-#: graphcommons.php:207
+#: graphcommons.php:192
+msgid "Search keyword"
+msgstr "Anahtar kelime"
+
+#: graphcommons.php:193
+msgid "Type something, results will be displayed here."
+msgstr "Yazmaya başlayın, sonuçlar burada görüntülenecek."
+
+#: graphcommons.php:194 graphcommons.php:286
+msgid "Insert Graph Commons Node Card"
+msgstr "Graph Commons Node Kartı Ekle"
+
+#: graphcommons.php:209
 msgid "Create or get your Graph Commons API key"
 msgstr "Graph Commons API Anahtarınızı üretin ya da öğrenin"
 
-#: graphcommons.php:245
+#: graphcommons.php:247
 #, php-format
 msgid ""
 "Please visit <a href=\"%1$s\">Graph Commons Plugin Settings page</a> and "
 "specify your API key"
 msgstr ""
-"Lütfen <a href=\"%1$s\">Graph Commons Plugin Ayarları sayfasını</a>  "
-"ziyaret edip API anahtarınızı girin"
+"Lütfen <a href=\"%1$s\">Graph Commons Plugin Ayarları sayfasını</a>  ziyaret "
+"edip API anahtarınızı girin"
 
-#: graphcommons.php:284
-msgid "Insert Graph Commons Node Card"
-msgstr "Graph Commons Node Kartı Ekle"
+#~ msgid "Type something, results will be displayed here"
+#~ msgstr "Bir şeyler yazın, sonuçlar burada görüntülenecek."
