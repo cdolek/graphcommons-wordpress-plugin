@@ -57,23 +57,14 @@ jQuery(function ($) {
             
         });
 
-/*
+    /*
         // contentEditable bug copying the last class used! remove it when enter key is pressed!
         tinyMCE.editors.content.on('keyup',function(e){
             if ( 13 === e.keyCode ) {
                $(tinyMCE.editors.content.selection.getNode()).closest('p').removeAttr('class');
             }
         });
-*/
-
-        editor.addButton('graphcommons', {
-            text: 'Add Graph Commons Node Card',
-            icon: false,
-            // cmd: 'open_window',
-            onclick: function() {
-                wp.mce.graphcommons.popupwindow(editor);
-            }
-        });
+    */
 
     }); // tinymce plugin ******************************************************************************
 
@@ -287,14 +278,13 @@ jQuery(function ($) {
                     draw( response.nodes );
                     cache[keyword] = response.nodes;
                 } else {
-                    $('#gc_content').html('No results found for <strong>' + keyword + '</strong>.');
+                    $('#gc_content').html( graphcommons.language.noresultsfound + ' <strong>' + keyword + '</strong>.');
                 }
                 // console.log('> got ', response.nodes.length, ' results from the api');
                 working = false;
             }
         });
-
-        console.log( 'finished typing' );
+        // console.log( 'finished typing' );
     }
 
     /* Draw the table */
