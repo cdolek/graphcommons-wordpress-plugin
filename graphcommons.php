@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Graph Commons
-Plugin URI: http://binfil.com
+Plugin URI:  https://github.com/cdolek/graphcommons-wordpress
 Description: This plugin helps you find and insert node cards into your blog using Graph Commons API.
 Version: 1.0.0
 Author: Cenk Dolek
@@ -9,7 +9,7 @@ Text Domain: graphcommons
 Domain Path: /lang
 Author URI: http://cenkdolek.com
 Author Email: cdolek@gmail.com
-License: GPL2
+License: Released under the MIT License
 */
 
 // If this file is called directly, abort.
