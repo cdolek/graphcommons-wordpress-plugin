@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-08 17:54-0500\n"
+"POT-Creation-Date: 2016-01-08 18:14-0500\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -40,15 +40,19 @@ msgstr "Anahtar kelime"
 msgid "Type something, results will be displayed here."
 msgstr "Yazmaya başlayın, sonuçlar burada görüntülenecek."
 
-#: graphcommons.php:194 graphcommons.php:286
+#: graphcommons.php:194 graphcommons.php:287
 msgid "Insert Graph Commons Node Card"
 msgstr "Graph Commons Node Kartı Ekle"
 
-#: graphcommons.php:209
+#: graphcommons.php:195
+msgid "No results found for:"
+msgstr "Sonuç bulunamadı:"
+
+#: graphcommons.php:210
 msgid "Create or get your Graph Commons API key"
 msgstr "Graph Commons API Anahtarınızı üretin ya da öğrenin"
 
-#: graphcommons.php:247
+#: graphcommons.php:248
 #, php-format
 msgid ""
 "Please visit <a href=\"%1$s\">Graph Commons Plugin Settings page</a> and "
