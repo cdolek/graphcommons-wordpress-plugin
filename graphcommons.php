@@ -182,14 +182,16 @@ class GraphCommons {
         add_settings_field( 'gc-api_key', 'api_key', array(&$this, 'field_api_key_callback'), 'graphcommons', 'section-one' );
         
         // load javascript
-        wp_register_script( 'knockoutjs', plugins_url( '/js/knockout.min.js', __FILE__ ), array('jquery'), '3.4.0', true );
         wp_register_script( 'gc-script', plugins_url( '/js/graphcommons.js', __FILE__ ), array('jquery'), '1.0.0', true );
 
         wp_localize_script( 'gc-script', 'graphcommons', array(
             'api_key'       => $this->api_key, 
             'plugin_url'    => $this->plugin_url,
-            'language'      => array(
-                'hubsearchtext' => __('Select if you would like to search in hubs','graphcommons')
+            'language'      => array(                
+                'hubsearchtext' => __('Select if you would like to search in hubs','graphcommons'),
+                'searchkeyword' => __('Search keyword', 'graphcommons'),
+                'typesomething' => __('Type something, results will be displayed here.'),
+                'addgcnodecard' => __('Insert Graph Commons Node Card', 'graphcommons')
             )
         ) );
         
