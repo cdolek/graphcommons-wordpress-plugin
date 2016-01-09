@@ -35,9 +35,6 @@ class GraphCommons {
         $this->plugin_url           = plugin_dir_url( __FILE__ );
         $this->api_key              = esc_attr( get_option( 'gc-api_key' ) );
         $this->api_limit            = 20;  
-        // Set up activation hooks
-        register_activation_hook( __FILE__, array(&$this,   'activate') );
-        register_deactivation_hook( __FILE__, array(&$this, 'deactivate') );
 
         // Set up l10n        
         load_plugin_textdomain( 'graphcommons', false, dirname( plugin_basename( __FILE__ ) ) . '/lang' );                
@@ -47,12 +44,10 @@ class GraphCommons {
         add_action( 'admin_menu',               array(  &$this, 'gc_create_admin_menu' ) );
         add_action( 'admin_init',               array(  &$this, 'gc_admin_init' ) );
         add_action( 'admin_notices',            array(  &$this, 'gc_admin_notice' ) );
-        add_action( 'init',                     array(  &$this, 'gc_custom_rewrite_tag'), 10, 0 );    
-        add_action( 'wp_ajax_get_nodes_json',   array(  &$this, 'get_nodes_json' ) );
-        add_action( 'wp_ajax_get_hubs_json',    array(  &$this, 'get_hubs_json' ) );
         add_action( 'admin_footer',             array(  &$this, 'gc_admin_footer' ) ) ;        
         add_action( 'media_buttons',            array(  &$this, 'gc_media_buttons' ), 11 );
-        
+        add_action( 'wp_ajax_get_nodes_json',   array(  &$this, 'get_nodes_json' ) );
+
         /** 
         todo:
             add_action( 'init', array( &$this, 'gc_oembed_provider' ) );
@@ -86,17 +81,17 @@ class GraphCommons {
                 */              
 
                 case 'nodes_search':
-                    $this->gc_api_nodes_search('https://graphcommons.com/api/v1/nodes/search?query='. $this->keyword . '&limit=' . $this->api_limit);
-                    break;
-
-                case 'hubs':
-                    $this->get_hubs_json();
+                    $this->get_url_and_print_json('https://graphcommons.com/api/v1/nodes/search?query='. $this->keyword . '&limit=' . $this->api_limit);
                     break;
 
                 default:                
                     break;
             } // switch
 
+            /*
+            header( 'Content-type: application/json' );
+            echo $response;
+            */
             exit(0);
 
         } //if
@@ -105,32 +100,30 @@ class GraphCommons {
 
     // get json for nodes
     function get_nodes_json() {
-        $keyword = $_POST['keyword'];
-        $hub = $_POST['hub'];
-        $url = 'https://graphcommons.com/api/v1/nodes/search?query='. urlencode($keyword) . '&limit=' . $this->api_limit;       
+        $keyword    = $_POST['keyword'];
+        $hub        = $_POST['hub'];
+        $url        = 'https://graphcommons.com/api/v1/nodes/search?query='. urlencode($keyword) . '&limit=' . $this->api_limit;       
+        
         if ( $hub !== '' ) {
             $url = $url . '&hub=' . $hub;
         }
 
-        header( 'Content-type: application/json' );
-        echo $this->get_url($url);
-        die();
+        get_url_and_print_json( $url );
     }
 
-    // getting hubs list
-    function get_hubs_json() {
-        $url = 'https://graphcommons.com/hubs.json';        
-
+    // get and send url as json
+    function get_url_and_print_json( $url ) {
         header( 'Content-type: application/json' );
-        echo $this->get_url($url);
-        die();
-    }
+        $args = array(
+            'headers' => array(
+                'Authentication' => $this->api_key
+            )
+        );
+        $response = wp_remote_get( $url, $args );            
+        // $http_code = wp_remote_retrieve_response_code( $response );
 
-    // node search
-    function gc_api_nodes_search( $url ) {
-        header( 'Content-type: application/json' );
-        echo $this->get_url($url);
-        die();
+        echo $response['body'];
+        die();       
     }
 
     // Register oEmbed providers
@@ -174,16 +167,13 @@ class GraphCommons {
         add_options_page( $page_title, $menu_title, $capability, $menu_slug, $function = '' );
     }
 
-    function gc_admin_init() {
-        
-        delete_transient( 'graphcommons_hubs' );
+    function gc_admin_init() {                
 
         // get the hubs transient
         $this->hubs = get_transient( 'graphcommons_hubs' );
 
         if( false === $this->hubs ) {
-            // Transient expired, refresh the data
-            
+            // Transient expired, refresh the data        
             $response = wp_remote_get( 'https://graphcommons.com/hubs.json' );
             
             $json = json_decode( $response['body'] );
@@ -193,13 +183,16 @@ class GraphCommons {
                 $myArr[$key]['value']   = $value->id;
             }
 
+            // Add the initial value for empty selection
             array_unshift($myArr, array(
                 'text'  => __('Select if you would like to search in hubs','graphcommons'),
                 'value' => ''
             ));
 
+            // record the transient
             set_transient( 'graphcommons_hubs', $myArr, 60*60*24 ); // 60x60x24 = one day
-            // $this->hubs = $response['body'];
+
+            // we have the new hubs array now
             $this->hubs = $myArr;
         }
 
@@ -224,7 +217,7 @@ class GraphCommons {
             )
         ) );
         
-        wp_enqueue_script( array( 'knockoutjs', 'gc-script' ) );
+        wp_enqueue_script( array( 'gc-script' ) );
 
         // load styles
         wp_register_style( 'gc-style', plugins_url('css/graphcommons.css', __FILE__) );        
@@ -293,24 +286,6 @@ class GraphCommons {
         }
     }
 
-    // get url contents via curl
-    function get_url($url, $method = null) {
-
-        $ch = curl_init();
-
-        curl_setopt_array($ch, array(
-            CURLOPT_HTTPHEADER      => array( 'Authentication: ' . $this->api_key ),
-            CURLOPT_URL             => $url,
-            CURLOPT_RETURNTRANSFER  => true,
-            CURLOPT_SSL_VERIFYPEER  => false,
-            CURLOPT_SSL_VERIFYHOST  => 2
-        ));
-
-        $result = curl_exec($ch);
-        curl_close($ch);
-        return $result;
-    }
-
     function gc_media_buttons() {
         echo '<a href="#" id="insert-graphcommons-node" class="button"><span class="dashicons dashicons-edit" style="margin-top: 3px;"></span> '.__('Insert Graph Commons Node Card', 'graphcommons').'</a>';
     }
@@ -333,25 +308,6 @@ class GraphCommons {
     function gc_register_button( $buttons ) {
         array_push( $buttons, 'seperator', 'graphcommons' );
         return $buttons;
-    }
-
-    function gc_add_rewrite_rules() {
-        add_rewrite_rule('^gc_api/([^/]*)/([^/]*)/?','index.php?gc_action=$matches[1]&gc_keyword=$matches[2]','top');        
-    }
-
-    function gc_custom_rewrite_tag() {
-        add_rewrite_tag('%gc_action%', '([^&]+)');
-        add_rewrite_tag('%gc_keyword%', '([^&]+)');
-    }
-
-    function activate() {
-        global $wp_rewrite;
-        $this->gc_add_rewrite_rules();
-        $wp_rewrite->flush_rules();
-    }
-
-    function deactivate(){        
-        flush_rewrite_rules();
     }
 
     function gc_admin_footer() {
