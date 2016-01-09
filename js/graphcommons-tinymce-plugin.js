@@ -97,8 +97,12 @@ jQuery(function ($) {
                     var self = this;
                     textbox = $('#'+self._id).find('input');                    
 
-                    $(textbox).attr('placeholder', graphcommons.language.searchkeyword);
-                    $(textbox).attr('type', 'search');
+                    $(textbox).attr({
+                        'placeholder'   : graphcommons.language.searchkeyword,
+                        'type'          : 'search',
+                        'onfocus'       : 'this.value = this.value;'
+                    });
+
                     $(textbox).css('padding-left', '10px');
                     
                     $(textbox).on('keyup', function(){
@@ -113,9 +117,9 @@ jQuery(function ($) {
                         // editor.execCommand('open_preview');
                         // self.close();
                         // console.log("data",data);
-                        wp.mce.graphcommons.popupwindowPreview(tinyMCE.activeEditor, "heyya");
+                        wp.mce.graphcommons.popupwindowPreview(tinyMCE.activeEditor, "n");
                     } );            
-                    console.log("values-->", values);
+
                 },
 
                 body:[
@@ -183,15 +187,24 @@ jQuery(function ($) {
                 ],
                 onsubmit: function( e ) {                    
                     var self = this;
-                    console.log("added");
+                    
                     var new_shortcode_str = '[graphcommons embed="node" id="'+gcwindowData.gcId+'" name="'+gcwindowData.gcName+'" type="'+gcwindowData.gcNodeType+'"][/graphcommons]';
-
-                    editor.insertContent( new_shortcode_str );
 
                     wp.mce.graphcommons.shortcode_data = wp.shortcode.next('graphcommons', new_shortcode_str);
 
+                    /*
                     tinyMCE.activeEditor.windowManager.close();
-                    tinyMCE.activeEditor.windowManager.windows[0].close();                    
+                    tinyMCE.activeEditor.windowManager.windows[0].close();    
+                    */                
+
+                    for (var i = tinyMCE.activeEditor.windowManager.windows.length - 1; i >= 0; i--) {
+                        tinyMCE.activeEditor.windowManager.windows[i].close();
+                    }
+    
+                    editor.insertContent( new_shortcode_str );
+
+                    console.log("node card added");
+
                 },
                 onclose: function(){
                     keyword = '';
