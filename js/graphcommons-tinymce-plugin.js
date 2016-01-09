@@ -14,37 +14,33 @@ jQuery(function ($) {
     gcwindowData,
     textbox;
 
-    /* GC TinyMCE Plugin */
+    /* TinyMCE Plugin */
     tinymce.PluginManager.add('graphcommons', function(editor, url) {        
 
         $(document).on('click', '#insert-graphcommons-node', function(e){
             e.preventDefault();
-            wp.mce.graphcommons.popupwindow(editor);                        
+            wp.mce.graphcommons.popupwindow(editor);
         });
 
-    /*
-        // contentEditable bug copying the last class used! remove it when enter key is pressed!
-        tinyMCE.editors.content.on('keyup',function(e){
-            if ( 13 === e.keyCode ) {
-               $(tinyMCE.editors.content.selection.getNode()).closest('p').removeAttr('class');
-            }
-        });
-    */
-
-    }); // tinymce plugin ******************************************************************************
+    });
 
 
-    var media = wp.media, shortcode_string = 'graphcommons';
+    var media = wp.media, shortcode_string = 'graphcommons', w = false, pw = false;
+
     wp.mce = wp.mce || {};
+
     wp.mce.graphcommons = {
+
         shortcode_data: {},
+
         template: media.template( 'editor-graphcommons' ),
+
         getContent: function() {
             var options = this.shortcode.attrs.named;
             options['innercontent'] = this.shortcode.content;
-            console.log("options", options);
             return this.template(options);
         },
+
         View: { // before WP 4.2:
             template: media.template( 'editor-graphcommons' ),
             postID: $('#post_ID').val(),
@@ -58,42 +54,25 @@ jQuery(function ($) {
                 return this.template(options);
             }
         },
-        edit: function( data, update ) {
-            console.log("editting", data, update);
+
+        edit: function( data, update ) {            
             var shortcode_data = wp.shortcode.next(shortcode_string, data);
             var values = shortcode_data.shortcode.attrs.named;
             values['innercontent'] = shortcode_data.shortcode.content;
             wp.mce.graphcommons.popupwindow(tinyMCE.activeEditor, values);
         },
-        // this is called from our tinymce plugin, also can call from our "edit" function above
-        // wp.mce.graphcommons.popupwindow(tinyMCE.activeEditor, "bird");
-        popupwindow: function(editor, values, onsubmit_callback){
+
+        popupwindow: function(editor, values){            
+
             values = values || [];
-            if(typeof onsubmit_callback != 'function'){
-                onsubmit_callback = function( e ) {
-                    // Insert content when the window form is submitted (this also replaces during edit, handy!)
-                    var s = '[' + shortcode_string;
-                    for(var i in e.data){
-                        if(e.data.hasOwnProperty(i) && i != 'innercontent'){
-                            s += ' ' + i + '="' + e.data[i] + '"';
-                        }
-                    }
-                    s += ']';
-                    if(typeof e.data.innercontent != 'undefined'){
-                        s += e.data.innercontent;
-                        s += '[/' + shortcode_string + ']';
-                    }
-                    editor.insertContent( s );
-                    console.log("onsubmit from popupwindow");
-                };
-            }
-            editor.windowManager.open( {
+
+            w = editor.windowManager.open( {
                 title: graphcommons.language.addgcnodecard,
                 width: 800,
                 height: 580,
                 buttons: [],
                 onPostRender: function(e){
-                    // console.log(e.data.title);
+
                     var self = this;
                     textbox = $('#'+self._id).find('input');                    
 
@@ -107,18 +86,8 @@ jQuery(function ($) {
                     
                     $(textbox).on('keyup', function(){
                         keyword = $(this).val().trim();
-                        // console.log("typing", keyword);
                         clearTyperTimeout();
                     });
-
-                    $(document).on('click', '.tt-suggestion', function(e){
-                        e.preventDefault();
-                        gcwindowData = $(this).data();
-                        // editor.execCommand('open_preview');
-                        // self.close();
-                        // console.log("data",data);
-                        wp.mce.graphcommons.popupwindowPreview(tinyMCE.activeEditor, "n");
-                    } );            
 
                 },
 
@@ -149,13 +118,19 @@ jQuery(function ($) {
 
                     ],
 
-
-                onsubmit: onsubmit_callback
+                onclose: function(){
+                    keyword = '';
+                    gcwindowData = {};                    
+                },
+                oncancel: function(){                                     
+                }
             } );
         },
+       
         popupwindowPreview: function(editor, values, onsubmit_callback){
 
             values = values || [];
+            
             if(typeof onsubmit_callback != 'function'){
                 onsubmit_callback = function( e ) {
                     // Insert content when the window form is submitted (this also replaces during edit, handy!)
@@ -171,11 +146,10 @@ jQuery(function ($) {
                         s += '[/' + shortcode_string + ']';
                     }
                     editor.insertContent( s );
-                    // console.log("onsubmit from popupwindowPreview");
                 };
-            }
+            }            
 
-            editor.windowManager.open( {
+            pw = editor.windowManager.open( {
                 title: graphcommons.language.nodepreview,
                 body: [
                     {
@@ -191,19 +165,10 @@ jQuery(function ($) {
                     var new_shortcode_str = '[graphcommons embed="node" id="'+gcwindowData.gcId+'" name="'+gcwindowData.gcName+'" type="'+gcwindowData.gcNodeType+'"][/graphcommons]';
 
                     wp.mce.graphcommons.shortcode_data = wp.shortcode.next('graphcommons', new_shortcode_str);
-
-                    /*
-                    tinyMCE.activeEditor.windowManager.close();
-                    tinyMCE.activeEditor.windowManager.windows[0].close();    
-                    */                
-
-                    for (var i = tinyMCE.activeEditor.windowManager.windows.length - 1; i >= 0; i--) {
-                        tinyMCE.activeEditor.windowManager.windows[i].close();
-                    }
     
                     editor.insertContent( new_shortcode_str );
 
-                    console.log("node card added");
+                    wp.mce.graphcommons.closeAllWindows();
 
                 },
                 onclose: function(){
@@ -211,16 +176,28 @@ jQuery(function ($) {
                     gcwindowData = {};
                 },
                 oncancel: function(){
-                    // console.log("canceled");
                 }
             });
 
+        },
+
+        closeAllWindows: function(){
+            for (var i = tinyMCE.activeEditor.windowManager.windows.length - 1; i >= 0; i--) {
+                tinyMCE.activeEditor.windowManager.windows[i].close();
+            }
         }
-    };
+    
+    }; // wp.mce.graphcommons -----------
+
     wp.mce.views.register( shortcode_string, wp.mce.graphcommons );
 
 
-
+    /* trigger for the preview window */
+    $(document).on('click', '.tt-suggestion', function(e){
+        e.preventDefault();
+        gcwindowData = $(this).data();
+        wp.mce.graphcommons.popupwindowPreview( tinyMCE.activeEditor );
+    } );            
 
     /* user has "finished typing"  */
     function doneTyping() {
@@ -288,6 +265,7 @@ jQuery(function ($) {
         working = false;
     }
 
+    /* utils */
     function highlightKeyword( text ) {
         var searchTextRegExp = new RegExp(keyword , "i"); //  case insensitive regexp
         return text.replace(searchTextRegExp , '<span class="tt-highlight">$&</span>');
@@ -297,6 +275,5 @@ jQuery(function ($) {
         clearTimeout(typingTimer);
         typingTimer = setTimeout(doneTyping, doneTypingInterval);
     }
-
 
 }); // jQuery ends
