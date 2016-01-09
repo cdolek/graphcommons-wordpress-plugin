@@ -52,5 +52,5 @@ Authors
 License
 -------
 
-Copyright 2015 [Graph Commons](https://graphcommons.com)
+Copyright 2016 [Graph Commons](https://graphcommons.com)
 Released under the MIT License
