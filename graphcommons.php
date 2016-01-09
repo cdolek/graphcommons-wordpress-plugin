@@ -108,7 +108,7 @@ class GraphCommons {
             $url = $url . '&hub=' . $hub;
         }
 
-        get_url_and_print_json( $url );
+        $this->get_url_and_print_json( $url );
     }
 
     // get and send url as json
