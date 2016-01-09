@@ -146,6 +146,7 @@
     background-color: #DEDEDE;
 }
 
-.html-active #insert-graphcommons-node {
-    display: none;
+.html-active #insert-graphcommons-node {    
+    pointer-events: none;
+    opacity: 0.5;
 }
