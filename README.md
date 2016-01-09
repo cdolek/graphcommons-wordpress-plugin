@@ -11,7 +11,7 @@ Requirements
 
 Usage
 ------
-After installing, go to **Settings->Graph Commons** and add your API key. Then go to add new post page and you will see a new button.
+After installing, go to **Settings->Graph Commons** and add your API key. Then go to add new post page and you will see a new button. Make sure that you are on the "Visual" mode.
 
 
 Installation
