@@ -3,58 +3,23 @@ jQuery(function ($) {
     'use strict';
 
     var
-    cache = {},
+    cache                   = {},
+    working                 = false,
+    selectedHubId           = '',
+    doneTypingInterval      = 500,
     keyword,
     typingTimer,
     selectedNode,
     gcwindow,
     gcwindowData,
-    textbox,
-    working = false,
-    selectedHubId = '',
-    hubs = [{
-        text: graphcommons.language.hubsearchtext,
-        value: ''
-    }],
-    doneTypingInterval  = 500;
+    textbox;
 
     /* GC TinyMCE Plugin */
     tinymce.PluginManager.add('graphcommons', function(editor, url) {        
 
         $(document).on('click', '#insert-graphcommons-node', function(e){
             e.preventDefault();
-
-            if ( hubs.length === 1 ) {
-
-                // get the hubs              
-                $.ajax({
-                    type        : "post",
-                    dataType    : "json",
-                    url         : ajaxurl,
-                    data        : 
-                        {
-                            action: "get_hubs_json",
-                            keyword: keyword
-                        },
-                    success: function(response) {
-                        // fill in hub data
-                        for (var i = 0; i < response.length; i++) {
-                            var hub = response[i];
-                            hubs.push( {
-                                text: hub.name,
-                                value: hub.id
-                            });                    
-                        }                        
-                        wp.mce.graphcommons.popupwindow(editor);
-                    }
-                });
-
-            } else {
-
-                // we already have hubs
-                wp.mce.graphcommons.popupwindow(editor);            
-            }
-            
+            wp.mce.graphcommons.popupwindow(editor);                        
         });
 
     /*
@@ -164,7 +129,7 @@ jQuery(function ($) {
                             type: 'listbox', 
                             name: 'gc_hubs', 
                             value: values['hub'],
-                            values: hubs,
+                            values: graphcommons.hubs,
                             onselect: function(e) {
                                 selectedHubId = this.value();
                                 cache = {};
@@ -207,7 +172,7 @@ jQuery(function ($) {
             }
 
             editor.windowManager.open( {
-                title: 'Graph Commons Node Preview',
+                title: graphcommons.language.nodepreview,
                 body: [
                     {
                     type   : 'container',

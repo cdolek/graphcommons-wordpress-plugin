@@ -2,7 +2,7 @@
 /*
 Plugin Name: Graph Commons
 Plugin URI:  https://github.com/cdolek/graphcommons-wordpress
-Description: This plugin helps you find and insert node cards into your blog using Graph Commons API.
+Description: Helps you find and insert Graph Commons node cards to your posts.
 Version: 1.0.0
 Author: Cenk Dolek
 Text Domain: graphcommons
@@ -26,6 +26,7 @@ class GraphCommons {
     private $api_limit;
     private $action;
     private $keyword;
+    private $hubs;
     
     function __construct() 
     {   
@@ -33,8 +34,7 @@ class GraphCommons {
         $this->plugin_path          = plugin_dir_path( __FILE__ );
         $this->plugin_url           = plugin_dir_url( __FILE__ );
         $this->api_key              = esc_attr( get_option( 'gc-api_key' ) );
-        $this->api_limit            = 20;
-
+        $this->api_limit            = 20;  
         // Set up activation hooks
         register_activation_hook( __FILE__, array(&$this,   'activate') );
         register_deactivation_hook( __FILE__, array(&$this, 'deactivate') );
@@ -43,15 +43,15 @@ class GraphCommons {
         load_plugin_textdomain( 'graphcommons', false, dirname( plugin_basename( __FILE__ ) ) . '/lang' );                
 
         // actions
-        add_action( 'pre_get_posts',            array(&$this, 'init') );
-        add_action( 'admin_menu',               array(&$this, 'gc_create_admin_menu' ) );
-        add_action( 'admin_init',               array(&$this, 'gc_admin_init' ) );
-        add_action( 'admin_notices',            array(&$this, 'gc_admin_notice' ) );
-        add_action( 'init',                     array(&$this, 'gc_custom_rewrite_tag'), 10, 0 );    
-        add_action( 'wp_ajax_get_nodes_json',   array(&$this, 'get_nodes_json' ) );
-        add_action( 'wp_ajax_get_hubs_json',    array(&$this, 'get_hubs_json' ) );
-        add_action( 'admin_footer',             array(&$this, 'gc_admin_footer' ) ) ;        
-        add_action( 'media_buttons',            array( &$this, 'gc_media_buttons' ), 11 );
+        add_action( 'pre_get_posts',            array(  &$this, 'init') );
+        add_action( 'admin_menu',               array(  &$this, 'gc_create_admin_menu' ) );
+        add_action( 'admin_init',               array(  &$this, 'gc_admin_init' ) );
+        add_action( 'admin_notices',            array(  &$this, 'gc_admin_notice' ) );
+        add_action( 'init',                     array(  &$this, 'gc_custom_rewrite_tag'), 10, 0 );    
+        add_action( 'wp_ajax_get_nodes_json',   array(  &$this, 'get_nodes_json' ) );
+        add_action( 'wp_ajax_get_hubs_json',    array(  &$this, 'get_hubs_json' ) );
+        add_action( 'admin_footer',             array(  &$this, 'gc_admin_footer' ) ) ;        
+        add_action( 'media_buttons',            array(  &$this, 'gc_media_buttons' ), 11 );
         
         /** 
         todo:
@@ -75,7 +75,7 @@ class GraphCommons {
         $this->action          = get_query_var( 'gc_action' );
         $this->keyword         = get_query_var( 'gc_keyword' );
 
-        if( isset( $this->action ) && !empty( $this->action ) ) {            
+        if( isset( $this->action ) && !empty( $this->action ) ) {
 
             switch ( $this->action ) {
 
@@ -176,6 +176,33 @@ class GraphCommons {
 
     function gc_admin_init() {
         
+        delete_transient( 'graphcommons_hubs' );
+
+        // get the hubs transient
+        $this->hubs = get_transient( 'graphcommons_hubs' );
+
+        if( false === $this->hubs ) {
+            // Transient expired, refresh the data
+            
+            $response = wp_remote_get( 'https://graphcommons.com/hubs.json' );
+            
+            $json = json_decode( $response['body'] );
+
+            foreach ($json as $key => $value) {
+                $myArr[$key]['text']    = $value->name;
+                $myArr[$key]['value']   = $value->id;
+            }
+
+            array_unshift($myArr, array(
+                'text'  => __('Select if you would like to search in hubs','graphcommons'),
+                'value' => ''
+            ));
+
+            set_transient( 'graphcommons_hubs', $myArr, 60*60*24 ); // 60x60x24 = one day
+            // $this->hubs = $response['body'];
+            $this->hubs = $myArr;
+        }
+
         // settings / options pages
         add_settings_section( 'section-one', 'API Credentials', array(&$this, 'section_one_callback'), 'graphcommons' );
         register_setting( 'graphcommons-settings-group', 'gc-api_key' );                    
@@ -187,12 +214,13 @@ class GraphCommons {
         wp_localize_script( 'gc-script', 'graphcommons', array(
             'api_key'       => $this->api_key, 
             'plugin_url'    => $this->plugin_url,
-            'language'      => array(                
-                'hubsearchtext' => __('Select if you would like to search in hubs','graphcommons'),
-                'searchkeyword' => __('Search keyword', 'graphcommons'),
-                'typesomething' => __('Type something, results will be displayed here'),
-                'addgcnodecard' => __('Insert Graph Commons Node Card', 'graphcommons'),
-                'noresultsfound' => __('No results found for:', 'graphcommons')
+            'hubs'          => $this->hubs,
+            'language'      => array(
+                'searchkeyword'     => __('Search keyword', 'graphcommons'),
+                'addgcnodecard'     => __('Insert Graph Commons Node Card', 'graphcommons'),
+                'noresultsfound'    => __('No results found for:', 'graphcommons'),
+                'typesomething'     => __('Start typing, results will be displayed here', 'graphcommons'),    
+                'nodepreview'       => __('Graph Commons Node Preview', 'graphcommons' )
             )
         ) );
         
