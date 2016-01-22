@@ -1,5 +1,5 @@
 === Graph Commons ===
-Contributors: cdolek
+Contributors: binfil
 Tags:  graphcommons, graph, insert graph, publishing, network analysis, vizualisation, visualization
 Requires at least: 3.3
 Tested up to: 4.4.1
