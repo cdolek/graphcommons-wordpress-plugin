@@ -46,8 +46,7 @@ class GraphCommons {
         add_action( 'admin_notices',            array( &$this, 'gc_admin_notice' ) );
         add_action( 'admin_footer',             array( &$this, 'gc_admin_footer' ) ) ;
         add_action( 'media_buttons',            array( &$this, 'gc_media_buttons' ), 11 );
-        add_action( 'wp_ajax_get_nodes_json',   array( &$this, 'get_nodes_json' ) );
-        add_action( 'wp_ajax_get_graphs_json',  array( &$this, 'get_graphs_json' ) );
+        add_action( 'wp_ajax_get_from_api',         array( &$this, 'gc_get_from_api' ) );
         add_action( 'init',                     array( &$this, 'gc_oembed_provider' ) );
 
         // shortcodes
@@ -65,34 +64,22 @@ class GraphCommons {
         // empty
     }
 
-    // get json for nodes
-    function get_nodes_json() {
+    // get json from api
+    function gc_get_from_api() {
         $keyword    = $_POST['keyword'];
         $hub        = $_POST['hub'];
-        $url        = 'https://graphcommons.com/api/v1/nodes/search?query='. urlencode($keyword) . '&limit=' . $this->api_limit;
+        $type        = $_POST['type'];
+        $url        = 'https://graphcommons.com/api/v1/' . $type . 's/search?query='. urlencode($keyword) . '&limit=' . $this->api_limit;
 
         if ( $hub !== '' ) {
             $url = $url . '&hub=' . $hub;
         }
 
-        $this->get_url_and_print_json( $url );
-    }
-
-    // get json for graphs
-    function get_graphs_json() {
-        $keyword    = $_POST['keyword'];
-        $hub        = $_POST['hub'];
-        $url        = 'https://graphcommons.com/api/v1/graphs/search?query='. urlencode($keyword) . '&limit=' . $this->api_limit;
-
-        if ( $hub !== '' ) {
-            $url = $url . '&hub=' . $hub;
-        }
-
-        $this->get_url_and_print_json( $url );
+        $this->gc_get_url_and_print_json( $url );
     }
 
     // get and send url as json
-    function get_url_and_print_json( $url ) {
+    function gc_get_url_and_print_json( $url ) {
         header( 'Content-type: application/json' );
         $args = array(
             'headers' => array(
@@ -101,7 +88,6 @@ class GraphCommons {
         );
         $response = wp_remote_get( $url, $args );
         // $http_code = wp_remote_retrieve_response_code( $response );
-
         echo $response['body'];
         die();
     }
