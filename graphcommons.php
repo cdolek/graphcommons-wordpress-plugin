@@ -2,8 +2,8 @@
 /*
 Plugin Name: Graph Commons
 Plugin URI:  https://github.com/cdolek/graphcommons-wordpress
-Description: Helps you find and insert Graph Commons node cards to your posts.
-Version: 1.0.0
+Description: Helps you find and insert Graph Commons objects to your posts.
+Version: 1.1.0
 Author: Cenk Dolek
 Text Domain: graphcommons
 Domain Path: /lang
