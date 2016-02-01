@@ -1,6 +1,6 @@
 === Graph Commons ===
 Contributors: binfil
-Tags:  graphcommons, graph, insert graph, publishing, network analysis, vizualisation, visualization
+Tags:  graphcommons, data vizualisation, network analysis, publishing, networks, big data, graph
 Requires at least: 3.3
 Tested up to: 4.4.1
 Stable tag: 1.1.0
