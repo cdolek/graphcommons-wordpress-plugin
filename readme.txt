@@ -3,7 +3,7 @@ Contributors: binfil
 Tags:  graphcommons, graph, insert graph, publishing, network analysis, vizualisation, visualization
 Requires at least: 3.3
 Tested up to: 4.4.1
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: MIT
 
 Insert Node Cards from Graph Commons to your blog.
@@ -32,6 +32,11 @@ You need a [Graph Commons membership](https://graphcommons.com) (free) and [API 
 4. Node inserted in the editor
 
 == Changelog ==
+
+= 1.1.0 =
+* oEmbed feature
+* Now you can insert graphs and nodes by just pasting the link from Graph Commons
+* Real inserted preview
 
 = 1.0.0 =
 * Initial Release!
