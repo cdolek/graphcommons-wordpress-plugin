@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-09 12:55-0500\n"
+"POT-Creation-Date: 2016-02-01 17:48-0500\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -21,42 +21,61 @@ msgstr ""
 "X-Poedit-SearchPath-0: lang\n"
 "X-Poedit-SearchPath-1: .\n"
 
-#: graphcommons.php:157
+#: graphcommons.php:119
 msgid ""
 "<strong>Error:</strong> Unknown embed type - Graph Commons Wordpress Plugin"
 msgstr ""
 "<strong>Hata:</strong> Bu embed türü tanınmıyor - Graph Commons Wordpress "
 "Plugin"
 
-#: graphcommons.php:197
+#: graphcommons.php:157
 msgid "Select if you would like to search in hubs"
 msgstr "Hub’larda arama yapmak için seçiniz"
 
-#: graphcommons.php:219
+#: graphcommons.php:181
 msgid "Search keyword"
 msgstr "Anahtar kelime"
 
-#: graphcommons.php:220 graphcommons.php:315
+#: graphcommons.php:182
 msgid "Insert Graph Commons Node Card"
 msgstr "Graph Commons Node Kartı Ekle"
 
-#: graphcommons.php:221
+#: graphcommons.php:183 graphcommons.php:283
+msgid "Insert Graph Commons Object"
+msgstr "Graph Commons Nesnesi Ekle"
+
+#: graphcommons.php:184
 msgid "No results found for:"
 msgstr "Sonuç bulunamadı:"
 
-#: graphcommons.php:222
+#: graphcommons.php:185
 msgid "Start typing, results will be displayed here"
 msgstr "Yazmaya başlayın, sonuçlar burada görüntülenecek"
 
-#: graphcommons.php:223
+#: graphcommons.php:186
 msgid "Graph Commons Node Preview"
 msgstr "Graph Commons Node Önizleme"
 
-#: graphcommons.php:238
+#: graphcommons.php:187
+msgid "Graph Commons Graph Preview"
+msgstr "Graph Commons Ağ Önizleme"
+
+#: graphcommons.php:202
 msgid "Create or get your Graph Commons API key"
 msgstr "Graph Commons API Anahtarınızı üretin ya da öğrenin"
 
-#: graphcommons.php:276
+#: graphcommons.php:233
+#, php-format
+msgid ""
+"Your theme has a <strong>$content_width</strong> setting of <strong>%1$s</"
+"strong> pixels. Inserted graphs will be shown at this width to be compatible "
+"with your design."
+msgstr ""
+"Temanızda <strong>$content_width</strong> değişkeni <strong>%1$s</strong> "
+"piksel olarak ayarlanmış. Sitenizin tasarımı ile uyumlu olması için "
+"yerleştirilen ağlar bu genişlikte gösterilecektir."
+
+#: graphcommons.php:262
 #, php-format
 msgid ""
 "Please visit <a href=\"%1$s\">Graph Commons Plugin Settings page</a> and "
