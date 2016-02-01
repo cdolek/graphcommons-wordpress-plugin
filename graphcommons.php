@@ -46,7 +46,7 @@ class GraphCommons {
         add_action( 'admin_notices',            array( &$this, 'gc_admin_notice' ) );
         add_action( 'admin_footer',             array( &$this, 'gc_admin_footer' ) ) ;
         add_action( 'media_buttons',            array( &$this, 'gc_media_buttons' ), 11 );
-        add_action( 'wp_ajax_get_from_api',         array( &$this, 'gc_get_from_api' ) );
+        add_action( 'wp_ajax_get_from_api',     array( &$this, 'gc_get_from_api' ) );
         add_action( 'init',                     array( &$this, 'gc_oembed_provider' ) );
 
         // shortcodes
@@ -180,9 +180,11 @@ class GraphCommons {
             'language'      => array(
                 'searchkeyword'     => __('Search keyword', 'graphcommons'),
                 'addgcnodecard'     => __('Insert Graph Commons Node Card', 'graphcommons'),
+                'addgcobject'       => __('Insert Graph Commons Object', 'graphcommons'),
                 'noresultsfound'    => __('No results found for:', 'graphcommons'),
                 'typesomething'     => __('Start typing, results will be displayed here', 'graphcommons'),
-                'nodepreview'       => __('Graph Commons Node Preview', 'graphcommons' )
+                'nodepreview'       => __('Graph Commons Node Preview', 'graphcommons' ),
+                'graphpreview'      => __('Graph Commons Graph Preview', 'graphcommons' )
             )
         ) );
 
@@ -218,9 +220,27 @@ class GraphCommons {
                 <?php submit_button(); ?>
             </form>
         </div>
+
+        <?php if ( $content_width > 0 ) { ?>
+
         <div class="wrap">
-            <?php echo "cw:" . $content_width; ?>
+            <hr>
+            <h2>Notes:</h2>
+            <p>
+            <?php
+
+            printf(
+            __( 'Your theme has a <strong>$content_width</strong> setting of <strong>%1$s</strong> pixels. Inserted graphs will be shown at this width to be compatible with your design.', 'graphcommons' ),
+                $content_width
+            );
+
+            ?>
+            </p>
+
         </div>
+
+        <?php } ?>
+
     <?php
     }
 
@@ -260,7 +280,7 @@ class GraphCommons {
     }
 
     function gc_media_buttons() {
-        echo '<a href="#" id="insert-graphcommons-node" class="button"><span class="dashicons dashicons-edit" style="margin-top: 3px;"></span> '.__('Insert Graph Commons Node Card', 'graphcommons').'</a>';
+        echo '<a href="#" id="insert-graphcommons-node" class="button"><span class="dashicons dashicons-edit" style="margin-top: 3px;"></span> '.__('Insert Graph Commons Object', 'graphcommons').'</a>';
     }
 
     // custom editor style
