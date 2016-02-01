@@ -6,11 +6,13 @@ Tested up to: 4.4.1
 Stable tag: 1.1.0
 License: MIT
 
-Insert Node Cards from Graph Commons to your blog.
+Insert Node Cards and Graphs from Graph Commons to your blog.
 
 == Description ==
 
-The Graph Commons plugin for WordPress allows you to insert node cards from Graph Commons to your posts.
+The Graph Commons plugin for WordPress allows you to insert node cards and graphs from Graph Commons to your posts.
+
+Just paste a link from Graph Commons to your editor and it will bring the object to your post. You can use the plugin's built in search functionality, preview your findings and then insert it as well.
 
 = About =
 
